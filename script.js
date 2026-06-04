@@ -1,15 +1,20 @@
-<script>
-async function atualizar() {
+async function atualizarContador() {
+    try {
+        const resposta = await fetch(
+            "https://projetomes-31cea-default-rtdb.firebaseio.com/maquinas/injetora_01/pecas.json"
+        );
 
-  const url =
-    "https://projetomes-31cea-default-rtdb.firebaseio.com/maquinas/injetora_01/pecas.json";
+        const pecas = await resposta.json();
 
-  const resposta = await fetch(url);
-  const pecas = await resposta.json();
+        document.getElementById("contador").innerText = pecas || 0;
 
-  document.getElementById("contador").innerText = pecas;
+    } catch (erro) {
+        console.error("Erro ao ler Firebase:", erro);
+    }
 }
 
-setInterval(atualizar, 1000);
-atualizar();
-</script>
+// Atualiza a cada segundo
+setInterval(atualizarContador, 1000);
+
+// Atualiza ao abrir a página
+atualizarContador();
