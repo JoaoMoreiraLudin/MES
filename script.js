@@ -1,5 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDJn252wAEujb3p2501MWAjeT3kp5rWOns",
@@ -16,7 +16,12 @@ const db = getDatabase(app);
 
 const contadorRef = ref(db, "maquinas/injetora_01/pecas");
 
+console.log("Firebase conectado");
+
 onValue(contadorRef, (snapshot) => {
-    document.getElementById("contador").innerText =
-        snapshot.val() ?? 0;
+    const valor = snapshot.val() ?? 0;
+
+    console.log("Mudou valor:", valor);
+
+    document.getElementById("contador").innerText = valor;
 });
