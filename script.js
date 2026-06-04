@@ -1,2 +1,19 @@
-document.getElementById("contador").innerText = "999";
-console.log("Script carregado!");
+async function atualizarContador() {
+    try {
+        const resposta = await fetch(
+            "https://projetomes-31cea-default-rtdb.firebaseio.com/maquinas/injetora_01/pecas.json"
+        );
+
+        const pecas = await resposta.json();
+
+        console.log("Valor recebido:", pecas);
+
+        document.getElementById("contador").innerText = pecas ?? 0;
+
+    } catch (erro) {
+        console.error("Erro Firebase:", erro);
+        document.getElementById("contador").innerText = "ERRO";
+    }
+}
+
+atualizarContador();
