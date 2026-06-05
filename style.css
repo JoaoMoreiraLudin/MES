@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+}
+
+header {
+    padding: 20px;
+    text-align: center;
+    background: #111827;
+}
+
+.grid {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.card {
+    background: #1f2937;
+    padding: 20px;
+    border-radius: 12px;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.counter {
+    font-size: 48px;
+    font-weight: bold;
+    color: #22c55e;
+    margin-top: 10px;
+}
+
+.status {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #ef4444;
+}
