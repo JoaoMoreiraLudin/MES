@@ -3,21 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MES</title>
+    <title>MES Produção</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h1>MES Produção</h1>
+<header>
+    <h1>📊 MES Produção</h1>
+</header>
+
+<main class="container">
 
     <div class="card">
+
         <h2>Máquina 01</h2>
-        <p>Peças produzidas:</p>
-        <h1 id="contador">0</h1>
+
+        <div id="status" class="status">● PARADA</div>
+
+        <p>Peças produzidas</p>
+
+        <div id="contador" class="contador">0</div>
+
     </div>
 
-    <script type="module" src="script.js"></script>
+</main>
+
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
