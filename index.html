@@ -9,27 +9,49 @@
 
 <body>
 
-<header>
-    <h1>📊 MES Produção</h1>
-</header>
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>LudinMES</h2>
+        </div>
 
-<main class="container">
+        <nav>
+            <a href="#">📊 Dashboard</a>
+            <a href="#">🏭 Produção</a>
+            <a href="#">⚙️ Máquinas</a>
+            <a href="#">📈 Relatórios</a>
+            <a href="#">🔧 Configurações</a>
+        </nav>
+    </aside>
 
-    <div class="card">
+    <div class="main-content">
 
-        <h2>Máquina 01</h2>
+        <header>
+            <h1>📊 MES Produção</h1>
+        </header>
 
-        <div id="status" class="status">● PARADA</div>
+        <main class="container">
 
-        <p>Peças produzidas</p>
+            <div class="card">
 
-        <div id="contador" class="contador">0</div>
+                <h2>Máquina 01</h2>
+
+                <div id="status" class="status">
+                    ● PARADA
+                </div>
+
+                <p>Peças produzidas</p>
+
+                <div id="contador" class="contador">
+                    0
+                </div>
+
+            </div>
+
+        </main>
 
     </div>
 
-</main>
-
-<script type="module" src="script.js"></script>
+    <script type="module" src="script.js"></script>
 
 </body>
 </html>
