@@ -1,57 +1,131 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LudinMES</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-<body>
+body{
+    display:flex;
+    min-height:100vh;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:#0f172a;
+    color:#fff;
+}
 
-    <aside class="sidebar">
-        <div class="logo">
-            <h2>LudinMES</h2>
-        </div>
+/* Sidebar */
 
-        <nav>
-            <a href="#">📊 Dashboard</a>
-            <a href="#">🏭 Produção</a>
-            <a href="#">⚙️ Máquinas</a>
-            <a href="#">📈 Relatórios</a>
-            <a href="#">🔧 Configurações</a>
-        </nav>
-    </aside>
+.sidebar{
+    width:260px;
+    height:100vh;
+    background:#111827;
+    position:fixed;
+    left:0;
+    top:0;
+    border-right:1px solid #1e293b;
+}
 
-    <div class="main-content">
+.logo{
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom:1px solid #1e293b;
+}
 
-        <header>
-            <h1>📊 MES Produção</h1>
-        </header>
+.logo h2{
+    color:#22c55e;
+    font-size:24px;
+    font-weight:700;
+}
 
-        <main class="container">
+.sidebar nav{
+    padding-top:10px;
+}
 
-            <div class="card">
+.sidebar nav a{
+    display:block;
+    color:#cbd5e1;
+    text-decoration:none;
+    padding:14px 24px;
+    transition:.2s;
+    font-size:15px;
+}
 
-                <h2>Máquina 01</h2>
+.sidebar nav a:hover{
+    background:#1f2937;
+    color:#fff;
+}
 
-                <div id="status" class="status">
-                    ● PARADA
-                </div>
+.sidebar nav a.active{
+    background:#22c55e20;
+    border-left:4px solid #22c55e;
+    color:#22c55e;
+}
 
-                <p>Peças produzidas</p>
+/* Área principal */
 
-                <div id="contador" class="contador">
-                    0
-                </div>
+.main-content{
+    margin-left:260px;
+    width:calc(100% - 260px);
+}
 
-            </div>
+/* Header */
 
-        </main>
+header{
+    height:70px;
+    background:#111827;
+    border-bottom:1px solid #1e293b;
 
-    </div>
+    display:flex;
+    align-items:center;
 
-    <script type="module" src="script.js"></script>
+    padding:0 30px;
+}
 
-</body>
-</html>
+header h1{
+    font-size:28px;
+    font-weight:600;
+    color:#fff;
+}
+
+/* Conteúdo */
+
+.container{
+    padding:30px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* Card */
+
+.card{
+    background:#1f2937;
+    padding:25px;
+    border-radius:16px;
+    width:320px;
+    border:1px solid #334155;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+.card h2{
+    margin-bottom:20px;
+}
+
+.status{
+    font-size:14px;
+    font-weight:700;
+    color:#ef4444;
+    margin-bottom:20px;
+}
+
+.contador{
+    font-size:56px;
+    font-weight:700;
+    color:#22c55e;
+}
+
+.card p{
+    margin-top:15px;
+    color:#94a3b8;
+}
