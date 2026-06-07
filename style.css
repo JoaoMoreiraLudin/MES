@@ -1,40 +1,106 @@
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-header {
-    padding: 20px;
-    text-align: center;
-    background: #111827;
+body{
+    display:flex;
+    min-height:100vh;
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:white;
 }
 
-.grid {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
+/* Sidebar */
+
+.sidebar{
+    width:250px;
+    height:100vh;
+    background:#111827;
+    position:fixed;
+    left:0;
+    top:0;
+    border-right:1px solid #1f2937;
 }
 
-.card {
-    background: #1f2937;
-    padding: 20px;
-    border-radius: 12px;
-    width: 250px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+.logo{
+    padding:20px;
+    text-align:center;
+    border-bottom:1px solid #1f2937;
 }
 
-.counter {
-    font-size: 48px;
-    font-weight: bold;
-    color: #22c55e;
-    margin-top: 10px;
+.logo h2{
+    color:#22c55e;
 }
 
-.status {
-    margin: 10px 0;
-    font-size: 14px;
-    color: #ef4444;
+.sidebar nav{
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar nav a{
+    color:#cbd5e1;
+    text-decoration:none;
+    padding:15px 20px;
+    transition:0.3s;
+}
+
+.sidebar nav a:hover{
+    background:#1f2937;
+    color:white;
+}
+
+/* Conteúdo principal */
+
+.main-content{
+    margin-left:250px;
+    width:100%;
+}
+
+header{
+    padding:20px;
+    background:#111827;
+    text-align:center;
+    border-bottom:1px solid #1f2937;
+}
+
+.container{
+    padding:30px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* Card da máquina */
+
+.card{
+    background:#1f2937;
+    padding:25px;
+    border-radius:16px;
+    width:300px;
+    box-shadow:0 0 15px rgba(0,0,0,0.4);
+}
+
+.card h2{
+    margin-bottom:15px;
+}
+
+.status{
+    margin:15px 0;
+    font-size:14px;
+    font-weight:bold;
+    color:#ef4444;
+}
+
+.contador{
+    font-size:56px;
+    font-weight:bold;
+    color:#22c55e;
+    margin-top:10px;
+}
+
+.card p{
+    color:#94a3b8;
+    margin-top:15px;
 }
