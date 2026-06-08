@@ -1,13 +1,14 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-
 import {
     getDatabase,
     ref,
     set,
     get,
     child,
-    remove
+    remove,
+    onValue
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
 
 
 // =======================
@@ -300,57 +301,59 @@ window.fecharCadastro = function() {
 
 abrirTela("dashboard");
 
-async function carregarMonitoramento() {
+let monitoramentoAtivo = false;
+
+function carregarMonitoramento() {
+
+    if (monitoramentoAtivo) return;
+    monitoramentoAtivo = true;
 
     const container =
         document.getElementById("monitoramentoMaquinas");
 
-    container.innerHTML = "";
+    const maquinasRef = ref(db, "maquinas");
 
-    const snapshot =
-        await get(child(ref(db), "maquinas"));
+    onValue(maquinasRef, (snapshot) => {
 
-    if (!snapshot.exists()) return;
+        container.innerHTML = "";
 
-    const maquinas = snapshot.val();
+        if (!snapshot.exists()) return;
 
-    Object.values(maquinas).forEach(maquina => {
+        const maquinas = snapshot.val();
 
-        let cor = "status-verde";
-        let emoji = "🟢";
+        Object.values(maquinas).forEach(maquina => {
 
-        if (maquina.status === "parada") {
-            cor = "status-amarelo";
-            emoji = "🟡";
-        }
+            let cor = "status-verde";
+            let emoji = "🟢";
 
-        if (maquina.status === "desligada") {
-            cor = "status-vermelho";
-            emoji = "🔴";
-        }
+            if (maquina.status === "parada") {
+                cor = "status-amarelo";
+                emoji = "🟡";
+            }
 
-        container.innerHTML += `
-            <div class="card-maquina">
+            if (maquina.status === "desligada") {
+                cor = "status-vermelho";
+                emoji = "🔴";
+            }
 
-                <div class="card-header">
+            container.innerHTML += `
+                <div class="card-maquina">
 
-                    <h3>${maquina.nome}</h3>
+                    <div class="card-header">
+                        <h3>${maquina.nome}</h3>
+                        <span>${emoji}</span>
+                    </div>
 
-                    <span>${emoji}</span>
+                    <p><strong>Código:</strong> ${maquina.codigo}</p>
+                    <p><strong>Setor:</strong> ${maquina.setor}</p>
+                    <p><strong>Quantidade:</strong> ${maquina.quantidade ?? 0}</p>
+
+                    <div class="monitor-status ${cor}">
+                        ${emoji} ${maquina.status || "produzindo"}
+                    </div>
 
                 </div>
-
-                <p><strong>Código:</strong> ${maquina.codigo}</p>
-
-                <p><strong>Setor:</strong> ${maquina.setor}</p>
-
-                <p><strong>Quantidade:</strong> ${maquina.quantidade ?? 0}</p>
-
-                <div class="monitor-status ${cor}">
-                    ${emoji} ${maquina.status || "produzindo"}
-                </div>
-
-            </div>
-        `;
+            `;
+        });
     });
 }
