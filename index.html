@@ -1,131 +1,220 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-body{
-    display:flex;
-    min-height:100vh;
-    font-family:'Segoe UI', Arial, sans-serif;
-    background:#0f172a;
-    color:#fff;
-}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LudinMES</title>
 
-/* Sidebar */
+    <link rel="stylesheet" href="style.css">
+</head>
 
-.sidebar{
-    width:260px;
-    height:100vh;
-    background:#111827;
-    position:fixed;
-    left:0;
-    top:0;
-    border-right:1px solid #1e293b;
-}
+<body>
 
-.logo{
-    height:70px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-bottom:1px solid #1e293b;
-}
+    <header class="top-header">
+        <h1>LudinMES</h1>
+    </header>
 
-.logo h2{
-    color:#22c55e;
-    font-size:24px;
-    font-weight:700;
-}
+    <div class="layout">
 
-.sidebar nav{
-    padding-top:10px;
-}
+        <aside class="sidebar">
 
-.sidebar nav a{
-    display:block;
-    color:#cbd5e1;
-    text-decoration:none;
-    padding:14px 24px;
-    transition:.2s;
-    font-size:15px;
-}
+            <nav>
 
-.sidebar nav a:hover{
-    background:#1f2937;
-    color:#fff;
-}
+                <a href="#" onclick="abrirTela('monitoramento')">
+                    <span class="icon">🖥️</span>
+                    <span class="text">Monitoramento</span>
+                </a>
 
-.sidebar nav a.active{
-    background:#22c55e20;
-    border-left:4px solid #22c55e;
-    color:#22c55e;
-}
+                <a href="#" onclick="abrirTela('dashboard')">
+                    <span class="icon">🏠</span>
+                    <span class="text">Dashboard</span>
+                </a>
 
-/* Área principal */
+                <a href="#" onclick="abrirTela('producao')">
+                    <span class="icon">📈</span>
+                    <span class="text">Produção</span>
+                </a>
 
-.main-content{
-    margin-left:260px;
-    width:calc(100% - 260px);
-}
+                <a href="#" onclick="abrirTela('maquinas')">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Máquinas</span>
+                </a>
 
-/* Header */
+                <a href="#" onclick="abrirTela('ordens')">
+                    <span class="icon">📋</span>
+                    <span class="text">Ordens</span>
+                </a>
 
-header{
-    height:70px;
-    background:#111827;
-    border-bottom:1px solid #1e293b;
+                <a href="#" onclick="abrirTela('relatorios')">
+                    <span class="icon">📄</span>
+                    <span class="text">Relatórios</span>
+                </a>
 
-    display:flex;
-    align-items:center;
+                <a href="#" onclick="abrirTela('configuracoes')">
+                    <span class="icon">🔧</span>
+                    <span class="text">Configurações</span>
+                </a>
 
-    padding:0 30px;
-}
+            </nav>
 
-header h1{
-    font-size:28px;
-    font-weight:600;
-    color:#fff;
-}
+        </aside>
 
-/* Conteúdo */
+        <main class="main-content">
 
-.container{
-    padding:30px;
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-}
+            <!-- DASHBOARD -->
+            <section id="dashboard" class="tela">
 
-/* Card */
+                <h2>Dashboard</h2>
 
-.card{
-    background:#1f2937;
-    padding:25px;
-    border-radius:16px;
-    width:320px;
-    border:1px solid #334155;
-    box-shadow:0 8px 20px rgba(0,0,0,.25);
-}
+                <p>
+                    Bem-vindo ao LudinMES.
+                </p>
 
-.card h2{
-    margin-bottom:20px;
-}
+            </section>
 
-.status{
-    font-size:14px;
-    font-weight:700;
-    color:#ef4444;
-    margin-bottom:20px;
-}
+            <!-- MONITORAMENTO -->
+            <section id="monitoramento" class="tela" style="display:none;">
 
-.contador{
-    font-size:56px;
-    font-weight:700;
-    color:#22c55e;
-}
+                <h2>Monitoramento</h2>
 
-.card p{
-    margin-top:15px;
-    color:#94a3b8;
-}
+                <div id="monitoramentoMaquinas" class="grid-maquinas"></div>
+
+            </section>
+
+            <!-- PRODUÇÃO -->
+            <section id="producao" class="tela" style="display:none;">
+
+                <h2>Produção</h2>
+
+                <p>
+                    Indicadores de produção.
+                </p>
+
+            </section>
+
+            <!-- MÁQUINAS -->
+            <section id="maquinas" class="tela" style="display:none;">
+
+                <div class="header-maquinas">
+
+                    <h2>Máquinas</h2>
+
+                    <button
+                        class="btn-add"
+                        onclick="abrirCadastro()"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+                <div id="listaMaquinas" class="grid-maquinas">
+
+                    <!-- Cards criados pelo JS -->
+
+                </div>
+
+            </section>
+
+            <!-- ORDENS -->
+            <section id="ordens" class="tela" style="display:none;">
+
+                <h2>Ordens</h2>
+
+                <p>
+                    Gestão de ordens de produção.
+                </p>
+
+            </section>
+
+            <!-- RELATÓRIOS -->
+            <section id="relatorios" class="tela" style="display:none;">
+
+                <h2>Relatórios</h2>
+
+                <p>
+                    Relatórios do sistema.
+                </p>
+
+            </section>
+
+            <!-- CONFIGURAÇÕES -->
+            <section id="configuracoes" class="tela" style="display:none;">
+
+                <h2>Configurações</h2>
+
+                <p>
+                    Configurações do sistema.
+                </p>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- MODAL CADASTRO -->
+
+    <div id="modalCadastro" class="modal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2 id="tituloModal">Nova Máquina</h2>
+
+                <button
+                    class="fechar"
+                    onclick="fecharCadastro()"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+            <form id="formCadastro">
+
+                <input
+                    type="text"
+                    id="nomeMaquina"
+                    placeholder="Nome da Máquina"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="codigoMaquina"
+                    placeholder="Código"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="setorMaquina"
+                    placeholder="Setor"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="esp32Id"
+                    placeholder="ESP32 ID"
+                    required
+                >
+
+                <button id="btnSalvar" type="submit">
+                    Cadastrar
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script type="module" src="script.js"></script>
+
+</body>
+
+</html>
