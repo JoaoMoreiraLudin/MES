@@ -320,22 +320,34 @@ function formatarTempo(ms) {
 function renderizarMonitoramento() {
     const container = document.getElementById("monitoramentoMaquinas");
     
-    // 🌍 Date.now() puro! Como o ESP32 já está em fuso de Brasília,
-    // o PC local, o GitHub e o celular vão bater a conta direto aqui.
-    const agora = Date.now();
+    // ====================================================================
+    // 🔥 AQUI ESTÁ A MUDANÇA: 
+    // Em vez de fixar 3 horas, o código pergunta para o Celular ou PC 
+    // qual é o fuso dele e corrige os milissegundos automaticamente!
+    // ====================================================================
+    const fusoDispositivoMs = new Date().getTimezoneOffset() * 60000;
+    const agora = Date.now() + fusoDispositivoMs;
 
     Object.values(maquinasCache).forEach(maquina => {
         const tempoHeartbeat = 15000;
         const tempoParada = maquina.tempoParada ?? 30000;
 
-        // Calculamos a diferença real sem mexer em fusos horários
+        // Calculamos a diferença de tempo usando a nova base estabilizada
         let tempoSemHeartbeat = maquina.heartbeat ? (agora - maquina.heartbeat) : Infinity;
         let tempoSemPulso = maquina.ultimoPulso ? (agora - maquina.ultimoPulso) : Infinity;
 
-        // 💡 COMPENSAÇÃO DE REDE: Se a conta der um número negativo pequeno 
-        // (por causa de milissegundos de atraso da internet), nós forçamos para 0
+        // 💡 COMPENSAÇÃO DE REDE: Se der algum valor negativo por delay de internet, vira 0
         if (tempoSemHeartbeat < 0) tempoSemHeartbeat = 0;
         if (tempoSemPulso < 0) tempoSemPulso = 0;
+
+        // Se o atraso bizarro de 3 horas (10800000 ms) ainda persistir em algum 
+        // aparelho específico, essa trava de segurança garante o zeramento:
+        if (tempoSemPulso > 7200000 && tempoSemPulso < 14400000) {
+            tempoSemPulso -= 10800000;
+        }
+        if (tempoSemHeartbeat > 7200000 && tempoSemHeartbeat < 14400000) {
+            tempoSemHeartbeat -= 10800000;
+        }
 
         let status = "Produzindo";
         let emoji = "🟢";
@@ -377,7 +389,6 @@ function renderizarMonitoramento() {
         card.querySelector(".setor").textContent = maquina.setor;
         card.querySelector(".quantidade").textContent = maquina.quantidade ?? 0;
         
-        // Renderiza o tempo limpo
         card.querySelector(".tempo").textContent = formatarTempo(tempoSemPulso);
 
         const statusDiv = card.querySelector(".status");
