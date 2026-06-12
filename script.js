@@ -330,7 +330,11 @@ function formatarTempo(ms) {
 function renderizarMonitoramento() {
 
     const container = document.getElementById("monitoramentoMaquinas");
-    const agora = Date.now();
+    
+    // ====================================================================
+    // MODIFICAÇÃO AQUI: Força o tempo do navegador para UTC 0 (Igual ao ESP32)
+    // ====================================================================
+    const agora = Date.now() + (new Date().getTimezoneOffset() * 60000);
 
     Object.values(maquinasCache).forEach(maquina => {
 
@@ -396,7 +400,9 @@ function renderizarMonitoramento() {
         card.querySelector(".codigo").textContent = maquina.codigo;
         card.querySelector(".setor").textContent = maquina.setor;
         card.querySelector(".quantidade").textContent = maquina.quantidade ?? 0;
-        card.querySelector(".tempo").textContent = formatarTempo(Math.max(0, tempoSemPulso));
+        
+        // Enviando o tempo calculado corretamente para o formatarTempo
+        card.querySelector(".tempo").textContent = formatarTempo(tempoSemPulso);
 
         const statusDiv = card.querySelector(".status");
         statusDiv.className = `monitor-status status ${cor}`;
