@@ -338,7 +338,7 @@ function renderizarMonitoramento() {
 
     Object.values(maquinasCache).forEach(maquina => {
 
-        const tempoHeartbeat = 15000;
+        const tempoHeartbeat = 5000;
         const tempoParada = maquina.tempoParada ?? 30000;
 
         const tempoSemHeartbeat = maquina.heartbeat
