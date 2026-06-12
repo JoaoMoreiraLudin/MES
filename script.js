@@ -334,7 +334,7 @@ function renderizarMonitoramento() {
     // ====================================================================
     // MODIFICAÇÃO AQUI: Força o tempo do navegador para UTC 0 (Igual ao ESP32)
     // ====================================================================
-    const agora = Date.now() + (new Date().getTimezoneOffset() * 60000);
+    const agora = Date.now();
 
     Object.values(maquinasCache).forEach(maquina => {
 
