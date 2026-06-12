@@ -51,8 +51,9 @@ async function cadastrarMaquina() {
                 codigo,
                 setor,
                 esp32Id,
-                status: "desligada",
-                quantidade: 0
+                quantidade: 0,
+                ultimoPulso: 0,
+                heartbeat: 0,
             }
         );
 
@@ -299,61 +300,150 @@ window.fecharCadastro = function() {
 // TELA INICIAL
 // =======================
 
-abrirTela("dashboard");
-
 let monitoramentoAtivo = false;
+let maquinasCache = {};
+
+function formatarTempo(ms) {
+    // Se o valor for inválido, retorna zerado
+    if (!isFinite(ms)) {
+        return "00:00:00";
+    }
+
+    // SE O TEMPO FOR NEGATIVO OU MENOR QUE 0 (o que causa o travamento de 2s),
+    // nós invertemos o sinal ou forçamos ele a mostrar o tempo real decorrido.
+    // Para garantir que ele NÃO fique parado, pegamos o valor absoluto ou ajustamos o offset:
+    let totalSegundos = Math.floor(ms / 1000);
+
+    if (totalSegundos <= 0) {
+        // Se caiu aqui, significa que o relógio está "no futuro" por causa do delay.
+        // Forçamos ele a começar a contar os segundos a partir do momento em que o sinal chega!
+        totalSegundos = Math.abs(totalSegundos); 
+    }
+
+    const horas = Math.floor(totalSegundos / 3600);
+    const minutos = Math.floor((totalSegundos % 3600) / 60);
+    const segundos = totalSegundos % 60;
+
+    return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
+}
+
+function renderizarMonitoramento() {
+
+    const container = document.getElementById("monitoramentoMaquinas");
+    const agora = Date.now();
+
+    Object.values(maquinasCache).forEach(maquina => {
+
+        const tempoHeartbeat = 15000;
+        const tempoParada = maquina.tempoParada ?? 30000;
+
+        const tempoSemHeartbeat = maquina.heartbeat
+            ? agora - maquina.heartbeat
+            : Infinity;
+
+        const tempoSemPulso = maquina.ultimoPulso
+            ? agora - maquina.ultimoPulso
+            : Infinity;
+
+        let status = "Produzindo";
+        let emoji = "🟢";
+        let cor = "status-verde";
+
+        if (tempoSemHeartbeat > tempoHeartbeat) {
+
+            status = "Desligada";
+            emoji = "🔴";
+            cor = "status-vermelho";
+
+        } else if (tempoSemPulso > tempoParada) {
+
+            status = "Parada";
+            emoji = "🟡";
+            cor = "status-amarelo";
+
+        }
+
+        // Procura se o card já existe
+        let card = document.getElementById(`maq-${maquina.codigo}`);
+
+        // Cria apenas uma vez
+        if (!card) {
+
+            card = document.createElement("div");
+            card.className = "card-maquina";
+            card.id = `maq-${maquina.codigo}`;
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <h3 class="nome"></h3>
+                    <span class="emoji"></span>
+                </div>
+
+                <p><strong>Código:</strong> <span class="codigo"></span></p>
+                <p><strong>Setor:</strong> <span class="setor"></span></p>
+                <p><strong>Quantidade:</strong> <span class="quantidade"></span></p>
+                <p><strong>Tempo sem produzir:</strong> <span class="tempo"></span></p>
+
+                <div class="monitor-status status"></div>
+            `;
+
+            container.appendChild(card);
+        }
+
+        // Apenas atualiza os valores
+        card.querySelector(".nome").textContent = maquina.nome;
+        card.querySelector(".emoji").textContent = emoji;
+        card.querySelector(".codigo").textContent = maquina.codigo;
+        card.querySelector(".setor").textContent = maquina.setor;
+        card.querySelector(".quantidade").textContent = maquina.quantidade ?? 0;
+        card.querySelector(".tempo").textContent = formatarTempo(Math.max(0, tempoSemPulso));
+
+        const statusDiv = card.querySelector(".status");
+        statusDiv.className = `monitor-status status ${cor}`;
+        statusDiv.textContent = `${emoji} ${status}`;
+    });
+
+    // Remove cards de máquinas excluídas
+    document.querySelectorAll(".card-maquina").forEach(card => {
+
+        const codigo = card.id.replace("maq-", "");
+
+        if (!maquinasCache[codigo]) {
+            card.remove();
+        }
+
+    });
+}
 
 function carregarMonitoramento() {
 
     if (monitoramentoAtivo) return;
-    monitoramentoAtivo = true;
 
-    const container =
-        document.getElementById("monitoramentoMaquinas");
+    monitoramentoAtivo = true;
 
     const maquinasRef = ref(db, "maquinas");
 
+    // Atualiza cache quando o Firebase mudar
     onValue(maquinasRef, (snapshot) => {
 
-        container.innerHTML = "";
+        if (!snapshot.exists()) {
 
-        if (!snapshot.exists()) return;
+            maquinasCache = {};
+            renderizarMonitoramento();
+            return;
 
-        const maquinas = snapshot.val();
+        }
 
-        Object.values(maquinas).forEach(maquina => {
+        maquinasCache = snapshot.val();
 
-            let cor = "status-verde";
-            let emoji = "🟢";
+        renderizarMonitoramento();
 
-            if (maquina.status === "parada") {
-                cor = "status-amarelo";
-                emoji = "🟡";
-            }
-
-            if (maquina.status === "desligada") {
-                cor = "status-vermelho";
-                emoji = "🔴";
-            }
-
-            container.innerHTML += `
-                <div class="card-maquina">
-
-                    <div class="card-header">
-                        <h3>${maquina.nome}</h3>
-                        <span>${emoji}</span>
-                    </div>
-
-                    <p><strong>Código:</strong> ${maquina.codigo}</p>
-                    <p><strong>Setor:</strong> ${maquina.setor}</p>
-                    <p><strong>Quantidade:</strong> ${maquina.quantidade ?? 0}</p>
-
-                    <div class="monitor-status ${cor}">
-                        ${emoji} ${maquina.status || "produzindo"}
-                    </div>
-
-                </div>
-            `;
-        });
     });
+
+    // Atualiza os tempos na tela a cada segundo
+    setInterval(() => {
+
+        renderizarMonitoramento();
+
+    }, 1000);
 }
