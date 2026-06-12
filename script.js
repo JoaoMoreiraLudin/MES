@@ -304,22 +304,12 @@ let monitoramentoAtivo = false;
 let maquinasCache = {};
 
 function formatarTempo(ms) {
-    // Se o valor for inválido, retorna zerado
-    if (!isFinite(ms)) {
+    // Se o valor for inválido ou menor/igual a zero, garante que comece no zero
+    if (!isFinite(ms) || ms <= 0) {
         return "00:00:00";
     }
 
-    // SE O TEMPO FOR NEGATIVO OU MENOR QUE 0 (o que causa o travamento de 2s),
-    // nós invertemos o sinal ou forçamos ele a mostrar o tempo real decorrido.
-    // Para garantir que ele NÃO fique parado, pegamos o valor absoluto ou ajustamos o offset:
-    let totalSegundos = Math.floor(ms / 1000);
-
-    if (totalSegundos <= 0) {
-        // Se caiu aqui, significa que o relógio está "no futuro" por causa do delay.
-        // Forçamos ele a começar a contar os segundos a partir do momento em que o sinal chega!
-        totalSegundos = Math.abs(totalSegundos); 
-    }
-
+    const totalSegundos = Math.floor(ms / 1000);
     const horas = Math.floor(totalSegundos / 3600);
     const minutos = Math.floor((totalSegundos % 3600) / 60);
     const segundos = totalSegundos % 60;
@@ -327,36 +317,31 @@ function formatarTempo(ms) {
     return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
 }
 
-// ====================================================================
-// MODIFICAÇÃO: Separamos a leitura do Firebase da renderização do tempo
-// ====================================================================
-
 function renderizarMonitoramento() {
     const container = document.getElementById("monitoramentoMaquinas");
     
-    // Converte o tempo do navegador para UTC 0 de forma estável
-    const agora = Date.now() + (new Date().getTimezoneOffset() * 60000);
+    // 🌍 Date.now() puro! Como o ESP32 já está em fuso de Brasília,
+    // o PC local, o GitHub e o celular vão bater a conta direto aqui.
+    const agora = Date.now();
 
     Object.values(maquinasCache).forEach(maquina => {
-
         const tempoHeartbeat = 15000;
         const tempoParada = maquina.tempoParada ?? 30000;
 
-        const tempoSemHeartbeat = maquina.heartbeat
-            ? (agora - maquina.heartbeat)
-            : Infinity;
+        // Calculamos a diferença real sem mexer em fusos horários
+        let tempoSemHeartbeat = maquina.heartbeat ? (agora - maquina.heartbeat) : Infinity;
+        let tempoSemPulso = maquina.ultimoPulso ? (agora - maquina.ultimoPulso) : Infinity;
 
-        const tempoSemPulso = maquina.ultimoPulso
-            ? (agora - maquina.ultimoPulso)
-            : Infinity;
+        // 💡 COMPENSAÇÃO DE REDE: Se a conta der um número negativo pequeno 
+        // (por causa de milissegundos de atraso da internet), nós forçamos para 0
+        if (tempoSemHeartbeat < 0) tempoSemHeartbeat = 0;
+        if (tempoSemPulso < 0) tempoSemPulso = 0;
 
         let status = "Produzindo";
         let emoji = "🟢";
         let cor = "status-verde";
 
-        // Adicionamos uma pequena folga de 2 segundos na checagem do status
-        // para oscilações de rede não derrubarem a máquina para "Desligada"
-        if (tempoSemHeartbeat > (tempoHeartbeat + 2000)) {
+        if (tempoSemHeartbeat > tempoHeartbeat) {
             status = "Desligada";
             emoji = "🔴";
             cor = "status-vermelho";
@@ -372,7 +357,6 @@ function renderizarMonitoramento() {
             card = document.createElement("div");
             card.className = "card-maquina";
             card.id = `maq-${maquina.codigo}`;
-
             card.innerHTML = `
                 <div class="card-header">
                     <h3 class="nome"></h3>
@@ -393,8 +377,8 @@ function renderizarMonitoramento() {
         card.querySelector(".setor").textContent = maquina.setor;
         card.querySelector(".quantidade").textContent = maquina.quantidade ?? 0;
         
-        // O Math.max(0, ...) garante que o tempo nunca seja negativo (o que causava o 01s -> 00s)
-        card.querySelector(".tempo").textContent = formatarTempo(Math.max(0, tempoSemPulso));
+        // Renderiza o tempo limpo
+        card.querySelector(".tempo").textContent = formatarTempo(tempoSemPulso);
 
         const statusDiv = card.querySelector(".status");
         statusDiv.className = `monitor-status status ${cor}`;
@@ -403,9 +387,7 @@ function renderizarMonitoramento() {
 
     document.querySelectorAll(".card-maquina").forEach(card => {
         const codigo = card.id.replace("maq-", "");
-        if (!maquinasCache[codigo]) {
-            card.remove();
-        }
+        if (!maquinasCache[codigo]) card.remove();
     });
 }
 
